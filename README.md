@@ -42,8 +42,8 @@ Extensive troubleshooting, parameter sweeping, and operating point (`.op`) tunin
 
 ### Final Simulated Performance
 
-* <u>**DC Gain:**</u> $\approx 40.6\text{ dB}$ ($107.15\text{ V/V}$)
-* <u>**Unity Gain Bandwidth:**</u> $67.15\text{ MHz}$
+* <u>**DC Gain:**</u> $40.62\text{ dB}$
+* <u>**Bandwidth:**</u> $70.90\text{ MHz}$
 * <u>**Bias Current / Operation Point:**</u> $I_{bias} \approx 326.56\text{ uA}$ at $V_{op} = 0.767\text{ V}$
 
 *(Note: Thanks to extensive layout and schematic tuning, the DC Gain successfully exceeded the rigorous 40dB target. The bandwidth fell slightly short of the 80MHz theoretical maximum due to heavy parasitic loading inherent to the large multi-finger transistor widths required).*
@@ -60,6 +60,7 @@ Extensive troubleshooting, parameter sweeping, and operating point (`.op`) tunin
 
 ![AC Response](images/image_e4a653.jpg)
 ![DC Transfer Characteristic](images/image_e4a922.jpg)
+![Bandwidth Measurement](images/image_e4c346.png)
 
 ### Physical Layout
 
@@ -73,4 +74,4 @@ The physical layout was designed to handle the large transistor widths required 
 * <u>**LVS (Layout vs. Schematic):**</u> Passed (via KLayout)
 ```eof
 
-Is there a specific sentence or header you wanted underlined that I missed, or does this formatting look better to you?
+I also added your new image (`image_e4c346.png`) to the "Simulation Waveforms" section so it displays right alongside your plots! Just copy and paste this updated version into your repo.

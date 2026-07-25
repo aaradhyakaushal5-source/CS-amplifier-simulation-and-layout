@@ -1,5 +1,6 @@
 # Common Source (CS) Amplifier Design & Layout
 
+
 This repository contains the design, simulation, and physical layout of a Common Source (CS) Amplifier, developed using the open-source SkyWater 130nm PDK.
 
 ---
@@ -58,7 +59,18 @@ Following the AC analysis—which demonstrated ~40 dB of gain and a 70.9 MHz ban
 
 To keep the NMOS perfectly biased on its operational cliff, the input sine wave was centered exactly at the DC Q-point derived from previous sweeps. A 5 MHz test frequency was chosen to fall well within the amplifier's 70.9 MHz bandwidth.
 
-**Input Source Configuration:**
-```spice
-* VO = 0.767V (Q-point), VA = 1mV (Small signal), Freq = 5MHz
-Vin in 0 dc 0.767 ac 1 sin(0.767 1m 5Meg)
+Input Source Configuration:
+- VO = 0.767V (Q-point), VA = 1mV (Small signal), Freq = 5MHz Vin in 0 dc 0.767 ac 1 sin(0.767 1m 5Meg)
+
+Simulation Commands (.control block): .control save all
+-Run transient analysis: 1ns step size, 5us total duration tran 1n 5u
+-Plot input vs. output plot v(input) v(output) .endc
+
+## Results and Observations
+1) Initial Settling Time (RC Drift) During the first microsecond of the simulation, the output voltage slowly drifted upward before stabilizing. This is a normal physical response caused by the massive 7 pF load capacitor charging up to its final DC steady-state. Because the amplifier relies on a high output resistance (R_out) to achieve its 40 dB gain, the resulting RC time constant requires a few microseconds for the output node to fully charge.
+
+2)Phase Inversion As expected for a standard Common Source topology, the output waveform is 180 degrees out of phase with the input waveform. When the input throttle increases, the NMOS pulls the output node down.
+
+3)The DC Equilibrium (Input vs. Output Q-Points) Looking at the steady-state waveforms, the input and output signals center around different DC voltages:
+-Input DC Baseline: ~0.767 V (Forced by the input voltage source).
+-Output DC Baseline: ~779 mV (Floating).

@@ -68,9 +68,7 @@ Simulation Commands (.control block): .control save all
 
 ## Results and Observations
 1) Initial Settling Time (RC Drift) During the first microsecond of the simulation, the output voltage slowly drifted upward before stabilizing. This is a normal physical response caused by the massive 7 pF load capacitor charging up to its final DC steady-state. Because the amplifier relies on a high output resistance (R_out) to achieve its 40 dB gain, the resulting RC time constant requires a few microseconds for the output node to fully charge.
-
 2)Phase Inversion As expected for a standard Common Source topology, the output waveform is 180 degrees out of phase with the input waveform. When the input throttle increases, the NMOS pulls the output node down.
-
 3)The DC Equilibrium (Input vs. Output Q-Points) Looking at the steady-state waveforms, the input and output signals center around different DC voltages:
 -Input DC Baseline: ~0.767 V (Forced by the input voltage source).
 -Output DC Baseline: ~779 mV (Floating).

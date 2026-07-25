@@ -114,6 +114,41 @@ Fig 4a : Small signal plot
 
 ## DRC AND LVS CHECK
 
+### PHYSICAL LAYOUT
+
+The physical layout was designed to handle the large transistor widths required for the high unity-gain bandwidth. It utilizes a multi-finger transistor approach to reduce parasitic gate resistance, minimize layout area, and prevent design rule violations.
+
+
+### Verification & LVS Debugging
+
+* <u>**DRC (Design Rule Check): Passed (via KLayout)**</u>
+* <u>**LVS (Layout vs. Schematic): Passed (via KLayout)**</u>
+
+Achieving a clean LVS match required significant debugging to reconcile how Xschem generates netlists versus how KLayout extracts physical parameters. The actual culprit across the debugging session was two separate issues stacking on top of each other:
+
+1. Device Syntax (X-prefix vs M-prefix) The schematic was generating subcircuit calls, while the layout extractor was looking for native MOSFETs. This was fixed via the spiceprefix setting.
+
+2. Multiplier (nf=) vs. Total Width The nf= (number of fingers) multiplier was not being properly understood the same way between the schematic and the extracted netlist. The extracted layout netlist does not carry an nf= property; it simply reports one lumped device with the pre-multiplied total width. To fix this, the nf= parameter was dropped in the schematic, and the total width was used instead:
+
+ PMOS: Changed from W=818.925 nf=10 to W=8189.25
+ 
+ NMOS: Changed from W=69.985 nf=5 to W=349.925
+
+
+3. Pin Ordering The order of the variables related to M1, M2, and M3 was modified in the schematic subcircuit to exactly match the pin order generated in the CS_extracted.cir file
+
+Generated Schematic Netlist (Original): 
+
+.subckt cs VDD VO CURR VIN VSS M1 VO VIN VSS VSS sky130_fd_pr__nfet_01v8 L=1 W=69.985 nf=5 M2 CURR CURR VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=818.925 nf=10 M3 VO CURR VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=818.925 nf=10 .ends
+
+
+Edited Schematic Netlist (Final LVS Match): 
+
+.subckt CS CURR VDD VIN VO VSS M1 VO VIN VSS VSS sky130_fd_pr__nfet_01v8 L=1 W=349.925 M2 CURR CURR VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=8189.25 M3 VO CURR VDD VDD sky130_fd_pr__pfet_01v8 L=1 W=8189.25 .ends CS
+
+
+
+
 ![LVS check](images/fig6a.png)
 
 Fig 6a : LVS check

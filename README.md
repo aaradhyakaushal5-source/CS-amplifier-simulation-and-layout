@@ -29,7 +29,47 @@ The initial theoretical targets for this amplifier were calculated to meet the f
 Based on the standard 1.8V Sky130 transistor parameters extracted for this design (NMOS u = 301.97 cm^2/Vs, PMOS u= 24.42 cm^2/Vs, and an oxide thickness t_ox approx 4.15 nm), hand calculations dictated an initial bias current target of I_bias approx 326.55 uA and a target output resistance of R_o approx 28.42 kOhm to establish the foundational Aspect Ratios (W/L).
 
 ---
+## Technology Parameters
 
+| Parameter | nMOS | pMOS |
+| :--- | :--- | :--- |
+| $V_{th}$ (V) | 0.49439 | -1.0652 |
+| $\mu_0$ ($\text{cm}^2/\text{V}\cdot\text{s}$) | 301.97 | 24.424 |
+| $t_{ox}$ (nm) | 4.148 | 4.23 |
+
+Where $V_{th}$ is the threshold voltage, $\mu_0$ is the carrier mobility, and $t_{ox}$ is the oxide thickness.
+
+We also have $\epsilon_{rox} = 3.9$ and the vacuum electrical permittivity is $\epsilon_0 = 8.8541 \cdot 10^{-12} \text{ F/m}$. With that we can find $C_{ox}$:
+
+* **For the pMOS:** $C_{ox} = \frac{\epsilon_0 \cdot \epsilon_{rox}}{t_{ox}} = 8.163 \cdot 10^{-3} \text{ F/m}^2$
+* **For the nMOS:** $C_{ox} = 8.325 \cdot 10^{-3} \text{ F/m}^2$
+
+Using `lambda_n.spice` and `lambda_p.spice`, we found:
+
+$$ \lambda_n = 0.038052 \ \text{V}^{-1} $$
+$$ \lambda_p = 0.069696 \ \text{V}^{-1} $$
+
+---
+
+## Math & Calculations
+
+In order to find the output resistance that meets the frequency response requirements, we can use $f_{pole} = \frac{f_u}{A_v}$, where $f_u$ is the unity gain bandwidth. So,
+
+$$ R_o = \frac{1}{2\pi \cdot f_{pole} \cdot C_L} = 28.421 \text{ k}\Omega $$
+
+With this, we can find $I_{bias}$:
+
+$$ I_{bias} = \frac{1}{(\lambda_n + \lambda_p) R_o} = 326.557 \text{ u A} $$
+
+To satisfy the $V_{out(max)}$ of the project parameters, the drain-source voltage of M2 ($V_{DS2}$) must be $0.2\text{ V}$ ($V_{DD} - V_{out(max)}$). Thus, the aspect ratio of M2 (M3 will have the same) is:
+
+$$ \left(\frac{W}{L}\right)_2 = \frac{2 \cdot I_{bias}}{u \cdot C_{oxp} \cdot V_{DS2}^2} = 818.923 $$
+
+Lastly, the aspect ratio of M1 is calculated to provide the desired gain and minimum output voltage. Note that $g_{m1} = \frac{A_v}{R_o}$:
+
+$$ \left(\frac{W}{L}\right)_1 = \frac{g_{m1}}{u \cdot C_{oxn} \cdot (V_{GS1} - V_{thn})} = 69.985 $$
+
+---
 ## Troubleshooting & Final Tuned Values (DC & AC)
 
 Theoretical square-law equations only provide a starting point in the 130nm process due to short-channel effects and massive parasitic capacitances associated with large transistor widths. Extensive troubleshooting, parameter sweeping, and operating point (`.op`) tuning were required to keep all transistors in the saturation region while pushing the bandwidth against the heavy 7 pF load.

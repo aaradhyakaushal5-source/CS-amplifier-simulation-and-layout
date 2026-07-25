@@ -6,7 +6,7 @@ This repository contains the design, simulation, and physical layout of a Common
 
 ## Project Overview
 
-This project involved extensive troubleshooting, iterative simulation, and layout optimization to bridge the gap between theoretical hand-calculations and physical silicon realities.
+This project involved extensive troubleshooting, iterative simulation, and layout optimization to help me go from theoretical hand-calculations to physical silicon realities.
 
 All design and verification work was completed using the **IIC-OSIC-TOOLS** open-source toolchain container, utilizing:
 
@@ -20,58 +20,45 @@ All design and verification work was completed using the **IIC-OSIC-TOOLS** open
 
 The initial theoretical targets for this amplifier were calculated to meet the following rigorous parameters:
 
-* <u>**DC Gain:**</u> $\ge 40\text{ dB}$ ($\ge 100\text{ V/V}$)
-* <u>**Load Capacitance (**$C_L$**):**</u> $7\text{ pF}$
-* <u>**Unity Gain Bandwidth (**$f_u$**):**</u> $80\text{ MHz}$
-* <u>**Output Voltage Swing:**</u> $0.2\text{ V}$ to $1.6\text{ V}$
+* <u>**DC Gain:**</u> >= 40 dB (>= 100 V/V)
+* <u>**Load Capacitance (CL):**</u> 7 pF
+* <u>**Unity Gain Bandwidth (fu):**</u> 80 MHz
+* <u>**Output Voltage Swing:**</u> 0.2 V to 1.6 V
 
-Based on the standard 1.8V Sky130 transistor parameters extracted for this design (NMOS $u_0 = 301.97\text{ cm}^2/\text{V}\cdot\text{s}$, PMOS $u_0 = 24.42\text{ cm}^2/\text{V}\cdot\text{s}$, and an oxide thickness $t_{ox} \approx 4.15\text{ nm}$), hand calculations dictated an initial bias current target of $I_{bias} \approx 326.55\text{ uA}$ and a target output resistance of $R_o \approx 28.42\text{ k}\Omega$ to establish the foundational Aspect Ratios ($W/L$).
+Based on the standard 1.8V Sky130 transistor parameters extracted for this design (NMOS u = 301.97 cm^2/Vs, PMOS u= 24.42 cm^2/Vs, and an oxide thickness t_ox approx 4.15 nm), hand calculations dictated an initial bias current target of I_bias approx 326.55 uA and a target output resistance of R_o approx 28.42 kOhm to establish the foundational Aspect Ratios (W/L).
 
 ---
 
-## Troubleshooting & Final Tuned Values
+## Troubleshooting & Final Tuned Values (DC & AC)
 
-Theoretical square-law equations only provide a starting point in the 130nm process due to short-channel effects and massive parasitic capacitances associated with large transistor widths.
-
-Extensive troubleshooting, parameter sweeping, and operating point (`.op`) tuning were required to keep all transistors in the saturation region while pushing the bandwidth against the heavy $7\text{ pF}$ load.
+Theoretical square-law equations only provide a starting point in the 130nm process due to short-channel effects and massive parasitic capacitances associated with large transistor widths. Extensive troubleshooting, parameter sweeping, and operating point (`.op`) tuning were required to keep all transistors in the saturation region while pushing the bandwidth against the heavy 7 pF load.
 
 ### Final Transistor Sizing
 
-* <u>**PMOS (Active Load, `pfet_01v8`):**</u> $W = 818.923\text{ um}$, $L = 1\text{ um}$ (Implemented as $nf = 10$ fingers)
-* <u>**NMOS (Driver, `nfet_01v8`):**</u> $W = 69.985\text{ um}$, $L = 1\text{ um}$ (Implemented as $nf = 5$ fingers)
+* <u>**PMOS (Active Load, `pfet_01v8`):**</u> W = 818.923 um, L = 1 um (Implemented as nf = 10 fingers)
+* <u>**NMOS (Driver, `nfet_01v8`):**</u> W = 69.985 um, L = 1 um (Implemented as nf = 5 fingers)
 
 ### Final Simulated Performance
 
-* <u>**DC Gain:**</u> $40.62\text{ dB}$
-* <u>**Bandwidth:**</u> $70.90\text{ MHz}$
-* <u>**Bias Current / Operation Point:**</u> $I_{bias} \approx 326.56\text{ uA}$ at $V_{op} = 0.767\text{ V}$
+* <u>**DC Gain:**</u> 40.62 dB
+* <u>**Bandwidth:**</u> 70.90 MHz
+* <u>**Bias Current / Operation Point:**</u> I_bias approx 326.56 uA at V_op = 0.767 V
 
-*(Note: Thanks to extensive layout and schematic tuning, the DC Gain successfully exceeded the rigorous 40dB target. The bandwidth fell slightly short of the 80MHz theoretical maximum due to heavy parasitic loading inherent to the large multi-finger transistor widths required).*
+*(Note: Because of extensive layout and schematic tuning, the DC Gain successfully reached the 40dB target. The bandwidth fell slightly short of the 80MHz theoretical maximum due to heavy parasitic loading inherent to the large multi-finger transistor widths required).*
 
 ---
 
-## Schematics and Layout
+## Transient Analysis
 
-### Schematic
+### Overview
 
-![Schematic](images/schematic.png)
+Following the AC analysis—which demonstrated ~40 dB of gain and a 70.9 MHz bandwidth driving a heavy 7 pF load—the next step was to verify the time-domain behavior using a transient simulation. The goal was to observe the amplifier's real-world response to a small-signal sine wave and verify its steady-state DC equilibrium.
 
-### Simulation Waveforms
+### Test Setup
 
-![AC Response](images/image_e4a653.jpg)
-![DC Transfer Characteristic](images/image_e4a922.jpg)
-![Bandwidth Measurement](images/image_e4c346.png)
+To keep the NMOS perfectly biased on its operational cliff, the input sine wave was centered exactly at the DC Q-point derived from previous sweeps. A 5 MHz test frequency was chosen to fall well within the amplifier's 70.9 MHz bandwidth.
 
-### Physical Layout
-
-The physical layout was designed to handle the large transistor widths required for the high unity-gain bandwidth. It utilizes a multi-finger transistor approach to reduce parasitic gate resistance, minimize layout area, and prevent design rule violations.
-
-![Physical Layout](images/layout.png)
-
-### Verification
-
-* <u>**DRC (Design Rule Check):**</u> Passed (via KLayout)
-* <u>**LVS (Layout vs. Schematic):**</u> Passed (via KLayout)
-```eof
-
-I also added your new image (`image_e4c346.png`) to the "Simulation Waveforms" section so it displays right alongside your plots! Just copy and paste this updated version into your repo.
+**Input Source Configuration:**
+```spice
+* VO = 0.767V (Q-point), VA = 1mV (Small signal), Freq = 5MHz
+Vin in 0 dc 0.767 ac 1 sin(0.767 1m 5Meg)

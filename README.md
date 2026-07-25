@@ -67,8 +67,57 @@ Simulation Commands (.control block): .control save all
 -Plot input vs. output plot v(input) v(output) .endc
 
 ## Results and Observations
-1) Initial Settling Time (RC Drift) During the first microsecond of the simulation, the output voltage slowly drifted upward before stabilizing. This is a normal physical response caused by the massive 7 pF load capacitor charging up to its final DC steady-state. Because the amplifier relies on a high output resistance (R_out) to achieve its 40 dB gain, the resulting RC time constant requires a few microseconds for the output node to fully charge.
-2)Phase Inversion As expected for a standard Common Source topology, the output waveform is 180 degrees out of phase with the input waveform. When the input throttle increases, the NMOS pulls the output node down.
-3)The DC Equilibrium (Input vs. Output Q-Points) Looking at the steady-state waveforms, the input and output signals center around different DC voltages:
+1. Initial Settling Time (RC Drift) During the first microsecond of the simulation, the output voltage slowly drifted upward before stabilizing. This is a normal physical response caused by the massive 7 pF load capacitor charging up to its final DC steady-state. Because the amplifier relies on a high output resistance (R_out) to achieve its 40 dB gain, the resulting RC time constant requires a few microseconds for the output node to fully charge.
+
+2. Phase Inversion As expected for a standard Common Source topology, the output waveform is 180 degrees out of phase with the input waveform. When the input     throttle increases, the NMOS pulls the output node down.
+
+3. The DC Equilibrium (Input vs. Output Q-Points) Looking at the steady-state waveforms, the input and output signals center around different DC voltages:
 -Input DC Baseline: ~0.767 V (Forced by the input voltage source).
 -Output DC Baseline: ~779 mV (Floating).
+
+This offset is correct and expected. In this topology, the output node is not forced to a specific voltage. Instead, its DC baseline is entirely dictated by the internal current "tug-of-war" between the PMOS current mirror (acting as an active load) and the NMOS driver. The ~779 mV output level represents the exact mathematical point where the current supplied by the PMOS matches the current sunk by the NMOS, keeping the driving transistor safely in the saturation region.
+
+## Schematics and Layout
+### Schematic:
+![Schematic](images/fig1.png)
+
+## Simulation Waveforms
+![DC analysis](images/fig2a.png)
+
+Fig 2a: DC analysis.
+
+![DC analysis plot](images/fig2b.png)
+
+Fig 2b : DC analysis plot.
+
+![Freq response code](images/fig3a.png)
+
+Fig 3a : Freq response code
+
+![Freq response plot](images/fig3b.png)
+
+Fig 3b : Freq response plot
+
+![Small signal plot](images/fig4a.png)
+
+Fig 4a : Small signal plot
+
+![Small signal plot after some time](images/fig4b.png)
+
+ Fig 4b : Small signal plot after some time
+
+![Layout](images/fig5a.png)
+![Layout](images/fig5b.png)
+![Layout](images/fig5c.png)
+
+ Fig 5 a , b , c : Layout
+
+## DRC AND LVS CHECK
+
+![LVS check](images/fig6a.png)
+
+Fig 6a : LVS check
+
+![DRC check](images/fig6b.png)
+
+Fig 6b : DRC check
